@@ -4,16 +4,15 @@ import json
 import traceback
 import tkinter as tk
 import threading
-
+import time
 
 from tkinter import *
 from tkinter import scrolledtext
-# from . import utils
 
 BUTTON_WIDTH = 15
 # shared network message definitions
 BUFFER_SIZE = 1024
-TYPE_KEY = "t"
+MSG_TYPE_KEY = "t"
 STATUS_KEY = "s"
 DATA_KEY = "d"
 OK_STR = "ok"
@@ -40,7 +39,7 @@ class Window(Frame):
         self.clean_str.set("Clean")
         self.analysis_mode_int = IntVar()
         self.analysis_mode_int.set(0)
-        self.socket = None
+        self.serversocket = None
         self.request_buttons = []
         self.clean_options_labels = [
             "Missing SchoolIDs",
@@ -62,9 +61,9 @@ class Window(Frame):
             "Player-to-Manager",
         ]
         self.init_window()
+        self.init_socket()
 
     def init_window(self):
-
         # changing the title of our master widget
         self.master.title(self.title)
 
@@ -76,6 +75,7 @@ class Window(Frame):
             self.clean_frame, text="Cleaning Options")
         self.clean_options_frame.pack(side="left", expand="yes")
         self.clean_checkboxes = []
+        self.clean_checkbox_ints = []
         for label in self.clean_options_labels:
             chk_state = IntVar()
             chk_state.set(1)
@@ -83,6 +83,7 @@ class Window(Frame):
                               variable=chk_state, anchor='w')
             chk.pack(side='bottom')
             self.clean_checkboxes.append(chk)
+            self.clean_checkbox_ints.append(chk_state)
         # clean button
         clean_button = tk.Button(
             self.clean_frame,
@@ -160,7 +161,7 @@ class Window(Frame):
         self.console.pack(fill="x")
         self.console.config(height=10)
 
-        # clear & cancel buttons
+        # bottom buttons
         bot_frame = tk.Frame(self.master)
         bot_frame.pack(fill="both", expand="yes", side="bottom")
         clear_button = tk.Button(
@@ -176,49 +177,45 @@ class Window(Frame):
             width=BUTTON_WIDTH,
             command=self.cancel_request,
         )
-        self.cancel_button.pack(side="right")
+        # self.cancel_button.pack(side="right")
         self.cancel_button.config(state="disabled")
 
-    # def init_socket(self):
-    #     threading.Thread(target=listen_to_server).start()
-
-    # def listen_to_server(self):
-    #     while 1:
-    #         self.resp = self.socket.recv(BUFFER_SIZE)
-    #         if self.resp:
+    def init_socket(self):
+        if self.serversocket != None:
+            self.serversocket.close()
+        try:
+            host = socket.gethostname()
+            port = 9999
+            # create a socket object
+            self.serversocket = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM)
+            self.serversocket.connect((host, port))
+            self.log("Connected to server!")
+        except Exception as e:
+            self.log("CLANG! error while connecting to server")
 
     def clean_unclean(self):
         '''
         Method that toggles between sending clean & unclean request to server
         '''
-        if self.socket != None:
-            return
+        msg = {
+            MSG_TYPE_KEY: "",
+        }
         if self.clean_str.get() == "Clean":
-            # send unclean request to server
-            msg = {
-                TYPE_KEY: UNCLEAN_MSG_TYPE,
-            }
-            if self.send_request(msg):
-                self.clean_str.set("Unclean")
+            msg[MSG_TYPE_KEY] = UNCLEAN_MSG_TYPE
         else:
-            # send clean request to server
-            msg = {
-                TYPE_KEY: CLEAN_MSG_TYPE,
-            }
+            msg[MSG_TYPE_KEY] = CLEAN_MSG_TYPE
             # gather options from checkboxes
             bool_list = {}
-            for checkbox in self.clean_checkboxes:
-                bool_list[checkbox.text] = checkbox.var.get()
+            for labels, state in list(zip(self.clean_options_labels, self.clean_checkbox_ints)):
+                bool_list[labels] = state.get()
             msg[DATA_KEY] = bool_list
-            if self.send_request(msg):
-                self.clean_str.set("Clean")
+        self.send_request(msg)
 
     def analyze(self):
-        if self.socket != None:
-            return
         # send analyze request to server
         msg = {
-            TYPE_KEY: ANALYZE_MSG_TYPE,
+            MSG_TYPE_KEY: ANALYZE_MSG_TYPE,
         }
         table_list = []
         for i in self.analyze_listbox.curselection():
@@ -236,11 +233,9 @@ class Window(Frame):
         return
 
     def validate(self):
-        if self.socket != None:
-            return
         # send validate request to server
         msg = {
-            TYPE_KEY: ANALYZE_MSG_TYPE,
+            MSG_TYPE_KEY: ANALYZE_MSG_TYPE,
         }
         analysis_mode = self.analysis_mode_labels[self.analysis_mode_int.get()]
         data = {
@@ -274,64 +269,57 @@ class Window(Frame):
             button.config(state=state)
 
     def send_request(self, msg):
-        if self.socket != None:
-            self.log("Can't send request before response is received!")
+        if self.serversocket == None or self.serversocket.fileno == -1:
+            self.init_socket()
             return
         try:
             # disable request buttons
             self.update_request_button_state("disabled")
             # enable cancel request button
             self.cancel_button.config(state="normal")
-            self.log("Sending request <{}>...".format(msg[TYPE_KEY]))
-            self.socket = self.send_tcp_message(msg)
-            self.log("Awaiting response <{}>...".format(msg[TYPE_KEY]))
-            resp = self.socket.recv(BUFFER_SIZE)
-            resp = json.loads(pickle.loads(resp))
-            self.socket.close()
-            self.socket = None
-            # disable cancel request button
-            self.cancel_button.config(state="disabled")
-            # enable request buttons
-            self.update_request_button_state("normal")
-            # log results to output
-            self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
-            if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
-                self.log("{} result: ".format(resp[DATA_KEY]))
-                return True
-            return False
+            self.log("Sending request <{}>...".format(msg[MSG_TYPE_KEY]))
+            self.serversocket.send(pickle.dumps(json.dumps(msg)))
+            threading.Thread(target=self.listen_to_server,
+                             args=(msg[MSG_TYPE_KEY],)).start()
         except Exception as e:
             traceback.print_exc()
-            self.log("CLANG! error while sending request")
-            if self.socket != None:
-                self.socket.close()
-            self.socket = None
+            self.log("CLANG! error while sending request.")
+            if self.serversocket != None:
+                self.serversocket.close()
             # enable request buttons
             self.update_request_button_state("normal")
             # disable cancel request button
             self.cancel_button.config(state="disabled")
-            return False
 
-    def cancel_request(self):
-        if self.socket == None:
-            return
-        self.socket.close()
-        self.socket = None
+    def listen_to_server(self, message_type):
+        self.log("Awaiting response <{}>...".format(message_type))
+        resp = self.serversocket.recv(BUFFER_SIZE)
+        resp = json.loads(pickle.loads(resp))
         # disable cancel request button
         self.cancel_button.config(state="disabled")
         # enable request buttons
-        update_request_button_state("normal")
-        self.log("Request canceled")
+        self.update_request_button_state("normal")
+        # log results to output
+        self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
+        if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
+            self.log("{} result: ".format(resp[DATA_KEY]))
+            # toggle clean/unclean button text
+            if resp[MSG_TYPE_KEY] == CLEAN_MSG_TYPE:
+                self.clean_str.set("Unclean")
+            elif resp[MSG_TYPE_KEY] == UNCLEAN_MSG_TYPE:
+                self.clean_str.set("Clean")
 
-    def send_tcp_message(self, msg):
-        # get local machine name
-        host = socket.gethostname()
-        port = 9999
-        # create a socket object
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host, port))
-        msg = pickle.dumps(json.dumps(msg))
-        s.send(msg)
-        return s
+    # unused func
+    def cancel_request(self):
+        if self.serversocket == None:
+            return
+        # self.serversocket.close()
+        # self.serversocket = None
+        # disable cancel request button
+        # self.cancel_button.config(state="disabled")
+        # enable request buttons
+        # update_request_button_state("normal")
+        # self.log("Request canceled")
 
 
 def main():

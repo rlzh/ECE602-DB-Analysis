@@ -4,10 +4,11 @@ import json
 import time
 import random
 import traceback
+import threading
 
 # shared network message definitions
 BUFFER_SIZE = 1024
-TYPE_KEY = "t"
+MSG_TYPE_KEY = "t"
 STATUS_KEY = "s"
 DATA_KEY = "d"
 OK_STR = "ok"
@@ -23,43 +24,58 @@ LAST_NAME_KEY = "ln"
 
 
 def handle_message(msg):
-    print(type(msg))
-    print(msg)
-    msg = json.loads(msg)
-    resp = {STATUS_KEY: OK_STR}
-    time.sleep(1)
-    msg_type = msg[TYPE_KEY]
-    if msg_type == CLEAN_MSG_TYPE:
-        pass
-        # todo: call clean func here
-        # e.g. resp["d"], success = clean_func()
-    elif msg_type == UNCLEAN_MSG_TYPE:
-        pass
-        # todo: call clean func here
-        # e.g. resp["d"], success = clean_func()
-    elif msg_type == ANALYZE_MSG_TYPE:
-        # dummy resp (comment out later)
-        dummy_data = {
-            "acc": random.randint(80, 95),
-            "precision": random.randint(57, 83)
-        }
-        resp[DATA_KEY] = dummy_data
+    try:
+        msg = json.loads(msg)
+        resp = {STATUS_KEY: OK_STR}
 
-        # todo: call analyze func here
-        # e.g. resp["d"], success = analyze_func()
+        time.sleep(1)
+        msg_type = msg[MSG_TYPE_KEY]
+        if msg_type == CLEAN_MSG_TYPE:
+            pass
+            # todo: call clean func here
+            # e.g. resp["d"], success = clean_func()
+        elif msg_type == UNCLEAN_MSG_TYPE:
+            pass
+            # todo: call clean func here
+            # e.g. resp["d"], success = clean_func()
+        elif msg_type == ANALYZE_MSG_TYPE:
+            # dummy resp (comment out later)
+            dummy_data = {
+                "acc": random.randint(80, 95),
+                "precision": random.randint(57, 83)
+            }
+            resp[DATA_KEY] = dummy_data
 
-    elif msg_type == VALIDATE_MSG_TYPE:
-        # dummy resp (comment out later)
-        dummy_data = {
-            "predict": "yes" if random.randint(1, 2) == 2 else "no",
-            "gnd truth": "yes" if random.randint(1, 2) == 2 else "no"
-        }
-        resp[DATA_KEY] = dummy_data
+            # todo: call analyze func here
+            # e.g. resp["d"], success = analyze_func()
 
-        # todo: call analyze func here
-        # e.g. resp["d"], success = validate_func()
+        elif msg_type == VALIDATE_MSG_TYPE:
+            # dummy resp (comment out later)
+            dummy_data = {
+                "predict": "yes" if random.randint(1, 2) == 2 else "no",
+                "gnd truth": "yes" if random.randint(1, 2) == 2 else "no"
+            }
+            resp[DATA_KEY] = dummy_data
 
+            # todo: call analyze func here
+            # e.g. resp["d"], success = validate_func()
+    except Exception as e:
+        return {STATUS_KEY: ERR_STR}
     return resp
+
+
+def listen_to_client(s):
+    try:
+        while 1:
+            msg = s.recv(BUFFER_SIZE)
+            msg = pickle.loads(msg)
+            print("Received msg: " + str(msg))
+            resp = handle_message(msg)
+            print("Sending resp: " + str(resp))
+            s.send(pickle.dumps(json.dumps(resp)))
+    except Exception as e:
+        # traceback.print_exc()
+        s.close()
 
 
 def main():
@@ -82,13 +98,8 @@ def main():
         clientsocket, addr = serversocket.accept()
         try:
             print("Got a connection from %s" % str(addr))
-            msg = clientsocket.recv(BUFFER_SIZE)
-            msg = pickle.loads(msg)
-            print("Received msg: " + str(msg))
-            resp = handle_message(msg)
-            print("Sending resp: " + str(resp))
-            clientsocket.send(pickle.dumps(json.dumps(resp)))
-            clientsocket.close()
+            threading.Thread(target=listen_to_client,
+                             args=(clientsocket,)).start()
         except Exception as e:
             traceback.print_exc()
             continue
