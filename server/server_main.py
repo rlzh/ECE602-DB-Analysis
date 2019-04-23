@@ -26,10 +26,13 @@ LAST_NAME_KEY = "ln"
 def handle_message(msg):
     try:
         msg = json.loads(msg)
-        resp = {STATUS_KEY: OK_STR}
-
-        time.sleep(1)
         msg_type = msg[MSG_TYPE_KEY]
+        resp = {
+            STATUS_KEY: OK_STR,
+            MSG_TYPE_KEY: msg[MSG_TYPE_KEY],
+        }
+        # dummy sleep
+        time.sleep(1)
         if msg_type == CLEAN_MSG_TYPE:
             pass
             # todo: call clean func here

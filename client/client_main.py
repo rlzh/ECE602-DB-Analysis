@@ -177,7 +177,7 @@ class Window(Frame):
             width=BUTTON_WIDTH,
             command=self.cancel_request,
         )
-        # self.cancel_button.pack(side="right")
+        self.cancel_button.pack(side="right")
         self.cancel_button.config(state="disabled")
 
     def init_socket(self):
@@ -186,6 +186,7 @@ class Window(Frame):
         try:
             host = socket.gethostname()
             port = 9999
+            self.log("Initiating connection to server...")
             # create a socket object
             self.serversocket = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM)
@@ -202,14 +203,15 @@ class Window(Frame):
             MSG_TYPE_KEY: "",
         }
         if self.clean_str.get() == "Clean":
-            msg[MSG_TYPE_KEY] = UNCLEAN_MSG_TYPE
-        else:
             msg[MSG_TYPE_KEY] = CLEAN_MSG_TYPE
             # gather options from checkboxes
             bool_list = {}
             for labels, state in list(zip(self.clean_options_labels, self.clean_checkbox_ints)):
                 bool_list[labels] = state.get()
             msg[DATA_KEY] = bool_list
+        else:
+            msg[MSG_TYPE_KEY] = UNCLEAN_MSG_TYPE
+
         self.send_request(msg)
 
     def analyze(self):
@@ -235,7 +237,7 @@ class Window(Frame):
     def validate(self):
         # send validate request to server
         msg = {
-            MSG_TYPE_KEY: ANALYZE_MSG_TYPE,
+            MSG_TYPE_KEY: VALIDATE_MSG_TYPE,
         }
         analysis_mode = self.analysis_mode_labels[self.analysis_mode_int.get()]
         data = {
@@ -253,6 +255,7 @@ class Window(Frame):
         msg - string to be logged
         '''
         self.console.insert(tk.INSERT, "{}\n".format(msg))
+        self.console.yview_moveto(1.0)
 
     def clear_console(self):
         '''
@@ -269,9 +272,8 @@ class Window(Frame):
             button.config(state=state)
 
     def send_request(self, msg):
-        if self.serversocket == None or self.serversocket.fileno == -1:
+        if self.serversocket == None:
             self.init_socket()
-            return
         try:
             # disable request buttons
             self.update_request_button_state("disabled")
@@ -279,40 +281,48 @@ class Window(Frame):
             self.cancel_button.config(state="normal")
             self.log("Sending request <{}>...".format(msg[MSG_TYPE_KEY]))
             self.serversocket.send(pickle.dumps(json.dumps(msg)))
-            threading.Thread(target=self.listen_to_server,
+            threading.Thread(target=self.wait_for_resp,
                              args=(msg[MSG_TYPE_KEY],)).start()
         except Exception as e:
             traceback.print_exc()
             self.log("CLANG! error while sending request.")
             if self.serversocket != None:
                 self.serversocket.close()
+            self.serversocket = None
             # enable request buttons
             self.update_request_button_state("normal")
             # disable cancel request button
             self.cancel_button.config(state="disabled")
 
-    def listen_to_server(self, message_type):
-        self.log("Awaiting response <{}>...".format(message_type))
-        resp = self.serversocket.recv(BUFFER_SIZE)
-        resp = json.loads(pickle.loads(resp))
-        # disable cancel request button
-        self.cancel_button.config(state="disabled")
-        # enable request buttons
-        self.update_request_button_state("normal")
-        # log results to output
-        self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
-        if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
-            self.log("{} result: ".format(resp[DATA_KEY]))
+    def wait_for_resp(self, message_type):
+        try:
+            self.log("Awaiting response <{}>...".format(message_type))
+            resp = self.serversocket.recv(BUFFER_SIZE)
+            resp = json.loads(pickle.loads(resp))
+            print(resp)
+            # disable cancel request button
+            self.cancel_button.config(state="disabled")
+            # enable request buttons
+            self.update_request_button_state("normal")
+            # log results to output
+            self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
+            if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
+                self.log("Result: {}".format(resp[DATA_KEY]))
+
             # toggle clean/unclean button text
             if resp[MSG_TYPE_KEY] == CLEAN_MSG_TYPE:
                 self.clean_str.set("Unclean")
             elif resp[MSG_TYPE_KEY] == UNCLEAN_MSG_TYPE:
                 self.clean_str.set("Clean")
+        except Exception as e:
+            pass
 
     # unused func
+
     def cancel_request(self):
-        if self.serversocket == None:
-            return
+        pass
+        # if self.serversocket == None:
+        #     return
         # self.serversocket.close()
         # self.serversocket = None
         # disable cancel request button
