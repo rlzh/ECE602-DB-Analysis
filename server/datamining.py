@@ -33,6 +33,15 @@ def categorize(df):
                 df.loc[index, column] = 0
     return df
 
+def removezero(df):
+    for column in df:
+        #print("Column %s max is %s" % (column,df[column].max()))
+        if df[column].max() == 0:
+            df.drop(columns=[column], inplace = True)
+        # elif column == "pBK" or column == "award":
+        #     df.drop(columns=[column], inplace = True)
+    return df
+
 def newtrain(df):
     y = df.columns[-1]
     class_df = df.loc[df[y] == 1]
@@ -44,8 +53,6 @@ def newtrain(df):
     result = result.sample(frac=1)
     return result
 
-
-
 # Open database connection
 db = pymysql.connect(host,user,password,database)
 
@@ -53,7 +60,7 @@ db = pymysql.connect(host,user,password,database)
 cursor = db.cursor()
 
 #sql = "select * from treesource limit 4000"
-sql = "select * from treesource2 limit 2000"
+sql = "select * from treesource2 limit 3000"
 
 try:
    # Execute the SQL command
@@ -70,14 +77,18 @@ df = pd.DataFrame(list(results))
 #df.columns = ['playerID','bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','bpG','bpAB','bpR','bpH','bp2B','bp3B','bpHR','bpRBI','bpSB','bpCS','bpBB','bpSO','bpIBB','bpHBP','bpSH','bpSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','fpPOS','fpG','fpGS','fpIO','fpPO','fpA','fpE','fpDP','fpTP','fpPB','fpSB','fpCS','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','ppW','ppL','ppG','ppGS','ppCG','ppSHO','ppSV','ppIP','ppH','ppER','ppHR','ppBB','ppSO','ppBAO','ppERA','ppIBB','ppWP','ppHBP','ppBK','ppBFP','ppGF','ppR','ppSH','ppSF','award','nom','hof','man']
 df.columns = ['playerID','bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','award','nom','hof','man']
 df.fillna(value=0, inplace=True)
+df = removezero(df)
+playeridlist = df['playerID'].values
 y_nom = df['nom'].values.astype(int)
 y_hof = df['hof'].values.astype(int)
 y_man = df['man'].values.astype(int)
+df.drop(columns=['playerID', 'nom','hof','man'], inplace=True)
 
 #cols = ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','bpG','bpAB','bpR','bpH','bp2B','bp3B','bpHR','bpRBI','bpSB','bpCS','bpBB','bpSO','bpIBB','bpHBP','bpSH','bpSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','fpPOS','fpG','fpGS','fpIO','fpPO','fpA','fpE','fpDP','fpTP','fpPB','fpSB','fpCS','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','ppW','ppL','ppG','ppGS','ppCG','ppSHO','ppSV','ppIP','ppH','ppER','ppHR','ppBB','ppSO','ppBAO','ppERA','ppIBB','ppWP','ppHBP','ppBK','ppBFP','ppGF','ppR','ppSH','ppSF','award']
-cols = ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','award','nom','hof','man']
+cols = list(df.columns.values)
+#cols = ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','award','nom','hof','man']
 df = df[cols].applymap(np.int64)
-#df = df[cols].round(decimals=-1)
+df = df[cols].round(decimals=-1)
 #print(df)
 
 ########sklearn
@@ -94,15 +105,16 @@ target = 'nom'
 # print(df)
 # #data = df.drop(columns=['nom','hof','man','playerID'], inplace = True)
 # #nom_data = df.drop(columns=['hof','man','playerID'])
-nom_data = df.drop(columns=['hof','man'])
-nom_data = categorize(nom_data)
+#nom_data = df.drop(columns=['hof','man'])
+#nom_data = categorize(nom_data)
+nom_data = df
 nom_data[target] = y_nom.tolist()
 train, test = tree.train_test_split(nom_data)
 
-train = newtrain(train)
+#train = newtrain(train)
 
-print(train)
-print(test)
+#print(train["pBK"])
+#print(test)
 # #print(df)
 # #print ("count = %d" % (fname))
 
@@ -110,7 +122,8 @@ print(test)
 # An example use of 'build_tree' and 'predict'
 #df_train = clean('horseTrain.txt')
 #attributes =  ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','bpG','bpAB','bpR','bpH','bp2B','bp3B','bpHR','bpRBI','bpSB','bpCS','bpBB','bpSO','bpIBB','bpHBP','bpSH','bpSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','fpPOS','fpG','fpGS','fpIO','fpPO','fpA','fpE','fpDP','fpTP','fpPB','fpSB','fpCS','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','ppW','ppL','ppG','ppGS','ppCG','ppSHO','ppSV','ppIP','ppH','ppER','ppHR','ppBB','ppSO','ppBAO','ppERA','ppIBB','ppWP','ppHBP','ppBK','ppBFP','ppGF','ppR','ppSH','ppSF','award']
-attributes =  ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','award']
+#attributes =  ['bG','bAB','bR','bH','b2B','b3B','bHR','bRBI','bSB','bCS','bBB','bSO','bIBB','bHBP','bSH','bSF','fPOS','fG','fGS','fIO','fPO','fA','fE','fDP','fWP','fPB','fSB','fCS','fZR','pW','pL','pG','pGS','pCG','pSHO','pSV','pIP','pH','pER','pHR','pBB','pSO','pBAO','pERA','pIBB','pWP','pHBP','pBK','pBFP','pGF','pR','pSH','pSF','award']
+attributes = cols
 root = tree.build_tree(train, attributes, target)
 
 print("Accuracy of test data")

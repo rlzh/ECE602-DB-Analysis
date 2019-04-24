@@ -1,3 +1,8 @@
+
+
+
+
+
 CREATE VIEW tbatting as 
 select playerID, sum(G) as bG, sum(AB) as bAB, sum(R) as bR, sum(H) as bH, 
 sum(2B) as b2B, sum(3B) as b3B, sum(HR) as bHR, 
