@@ -1,8 +1,4 @@
 
-
-
-
-
 CREATE VIEW tbatting as 
 select playerID, sum(G) as bG, sum(AB) as bAB, sum(R) as bR, sum(H) as bH, 
 sum(2B) as b2B, sum(3B) as b3B, sum(HR) as bHR, 
@@ -57,29 +53,10 @@ CREATE VIEW tMan as
 select master.playerID, 1 as tomanager from master inner join Managers on master.playerID = Managers.playerID;
 
 CREATE VIEW player as 
-select playerID from master;
+select playerID,nameFirst,nameLast from master;
+
 
 Create VIEW treesource as
-select player.playerID,bG,bAB,bR,bH,b2B,b3B,bHR,bRBI,bSB,bCS,bBB,bSO,bIBB,bHBP,bSH,bSF,
-bpG,bpAB,bpR,bpH,bp2B,bp3B,bpHR,bpRBI,bpSB,bpCS,bpBB,bpSO,bpIBB,bpHBP,bpSH,bpSF,
-fPOS,fG,fGS,fIO,fPO,fA,fE,fDP,fWP,fPB,fSB,fCS,fZR,
-fpPOS,fpG,fpGS,fpIO,fpPO,fpA,fpE,fpDP,fpTP,fpPB,fpSB,fpCS,
-pW,pL,pG,pGS,pCG,pSHO,pSV,pIP,pH,pER,pHR,pBB,pSO,pBAO,pERA,pIBB,pWP,pHBP,pBK,pBFP,pGF,pR,pSH,pSF,
-ppW,ppL,ppG,ppGS,ppCG,ppSHO,ppSV,ppIP,ppH,ppER,ppHR,ppBB,ppSO,ppBAO,ppERA,ppIBB,ppWP,ppHBP,
-ppBK,ppBFP,ppGF,ppR,ppSH,ppSF,award,nom,hof,tomanager from player
-left outer join tbatting on tbatting.playerID = player.playerID
-left outer join tbattingpost on tbattingpost.playerID = player.playerID
-left outer join tfielding on tfielding.playerID = player.playerID
-left outer join tfieldingpost on tfieldingpost.playerID = player.playerID
-left outer join tpitching on tpitching.playerID = player.playerID
-left outer join tPitchingPost on tPitchingPost.playerID = player.playerID
-left outer join tawards on tawards.playerID = player.playerID
-left outer join tNom on tNom.playerID = player.playerID
-left outer join tHOF on tHOF.playerID = player.playerID
-left outer join tMan on tMan.playerID = player.playerID;
-
-
-Create VIEW treesource2 as
 select player.playerID,bG,bAB,bR,bH,b2B,b3B,bHR,bRBI,bSB,bCS,bBB,bSO,bIBB,bHBP,bSH,bSF,
 fPOS,fG,fGS,fIO,fPO,fA,fE,fDP,fWP,fPB,fSB,fCS,fZR,
 pW,pL,pG,pGS,pCG,pSHO,pSV,pIP,pH,pER,pHR,pBB,pSO,pBAO,pERA,pIBB,pWP,pHBP,pBK,pBFP,pGF,pR,pSH,pSF,
@@ -88,6 +65,47 @@ left outer join tbatting on tbatting.playerID = player.playerID
 left outer join tfielding on tfielding.playerID = player.playerID
 left outer join tpitching on tpitching.playerID = player.playerID
 left outer join tawards on tawards.playerID = player.playerID
+left outer join tNom on tNom.playerID = player.playerID
+left outer join tHOF on tHOF.playerID = player.playerID
+left outer join tMan on tMan.playerID = player.playerID;
+
+Create VIEW battingtree as
+select player.playerID,bG,bAB,bR,bH,b2B,b3B,bHR,bRBI,bSB,bCS,bBB,bSO,bIBB,bHBP,bSH,bSF,
+award,nom,hof,tomanager from player
+left outer join tbatting on tbatting.playerID = player.playerID
+left outer join tfielding on tfielding.playerID = player.playerID
+left outer join tpitching on tpitching.playerID = player.playerID
+left outer join tawards on tawards.playerID = player.playerID
+left outer join tNom on tNom.playerID = player.playerID
+left outer join tHOF on tHOF.playerID = player.playerID
+left outer join tMan on tMan.playerID = player.playerID;
+
+Create VIEW fieldingtree as
+select player.playerID,
+fPOS,fG,fGS,fIO,fPO,fA,fE,fDP,fWP,fPB,fSB,fCS,fZR,
+award,nom,hof,tomanager from player
+left outer join tbatting on tbatting.playerID = player.playerID
+left outer join tfielding on tfielding.playerID = player.playerID
+left outer join tpitching on tpitching.playerID = player.playerID
+left outer join tawards on tawards.playerID = player.playerID
+left outer join tNom on tNom.playerID = player.playerID
+left outer join tHOF on tHOF.playerID = player.playerID
+left outer join tMan on tMan.playerID = player.playerID;
+
+Create VIEW pitchingtree as
+select player.playerID,
+pW,pL,pG,pGS,pCG,pSHO,pSV,pIP,pH,pER,pHR,pBB,pSO,pBAO,pERA,pIBB,pWP,pHBP,pBK,pBFP,pGF,pR,pSH,pSF,
+award,nom,hof,tomanager from player
+left outer join tbatting on tbatting.playerID = player.playerID
+left outer join tfielding on tfielding.playerID = player.playerID
+left outer join tpitching on tpitching.playerID = player.playerID
+left outer join tawards on tawards.playerID = player.playerID
+left outer join tNom on tNom.playerID = player.playerID
+left outer join tHOF on tHOF.playerID = player.playerID
+left outer join tMan on tMan.playerID = player.playerID;
+
+Create VIEW validtree as
+select player.playerID,nameFirst,nameLast,nom,hof,tomanager from player
 left outer join tNom on tNom.playerID = player.playerID
 left outer join tHOF on tHOF.playerID = player.playerID
 left outer join tMan on tMan.playerID = player.playerID;

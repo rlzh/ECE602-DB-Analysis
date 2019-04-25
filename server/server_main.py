@@ -6,6 +6,8 @@ import random
 import traceback
 import threading
 
+import datamining
+
 # shared network message definitions
 BUFFER_SIZE = 1024
 MSG_TYPE_KEY = "t"
@@ -42,23 +44,60 @@ def handle_message(msg):
             # todo: call clean func here
             # e.g. resp["d"], success = clean_func()
         elif msg_type == ANALYZE_MSG_TYPE:
-            # dummy resp (comment out later)
-            dummy_data = {
-                "acc": random.randint(80, 95),
-                "precision": random.randint(57, 83)
+
+            content = msg[DATA_KEY]
+            table = content[TABLES_KEY]
+            mode = content[ANALYZE_MODE_KEY]
+
+            if mode == "HoF Nomination":
+                mode = "nom"
+            elif mode == "HoF Entry":
+                mode = "hof"
+            elif mode == "Player-to-Manager":
+                mode = "man"
+
+            if table[0] == "Batting":
+                table = "Batting"
+            elif table[0] == "Fielding":
+                table = "Fielding"
+            elif table[0] == "Pitching":
+                table = "Pitching"
+            else:
+                table = "All"
+
+            acc,f1 = datamining.AnalyzeMining(mode, table)
+
+            mining_data = {
+                "acc": acc,
+                "f1_score": f1
             }
-            resp[DATA_KEY] = dummy_data
+            resp[DATA_KEY] = mining_data
 
             # todo: call analyze func here
             # e.g. resp["d"], success = analyze_func()
 
         elif msg_type == VALIDATE_MSG_TYPE:
             # dummy resp (comment out later)
-            dummy_data = {
-                "predict": "yes" if random.randint(1, 2) == 2 else "no",
-                "gnd truth": "yes" if random.randint(1, 2) == 2 else "no"
+            # Received msg: {"t": "val", "d": {"ayz_m": "HoF Nomination", "fn": "ww ", "ln": "aa"}}
+            content = msg[DATA_KEY]
+            mode = content[ANALYZE_MODE_KEY]
+            fn = content[FIRST_NAME_KEY]
+            ln = content[LAST_NAME_KEY]
+
+            if mode == "HoF Nomination":
+                mode = "nom"
+            elif mode == "HoF Entry":
+                mode = "hof"
+            elif mode == "Player-to-Manager":
+                mode = "man"
+
+            pred, real = datamining.ValidationMining(mode, fn, ln)
+
+            mining_data = {
+                "predict": pred,
+                "gnd truth": real
             }
-            resp[DATA_KEY] = dummy_data
+            resp[DATA_KEY] = mining_data
 
             # todo: call analyze func here
             # e.g. resp["d"], success = validate_func()

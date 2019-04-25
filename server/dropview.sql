@@ -22,4 +22,10 @@ DROP VIEW player;
 
 DROP VIEW treesource;
 
-DROP VIEW treesource2;
+DROP VIEW battingtree;
+
+DROP VIEW fieldingtree;
+
+DROP VIEW pitchingtree;
+
+DROP VIEW validtree;
