@@ -59,7 +59,6 @@ def databaseconnection(sql):
     # disconnect from server
     db.close()
     print("disconnecting to db..")
-
     return results
 
 def AnalyzeMining(target, tables):
@@ -126,8 +125,7 @@ def ValidationMining(target, fn, ln):
     r_sql = "select * from validtree where nameFirst = \'" + fn + "\' and nameLast = \'" + ln + "\' limit 1;"
 
     realdata = databaseconnection(r_sql)
-    print(realdata)
-    if realdata == None:
+    if realdata == None or len(realdata) == 0:
         print("No record exists for %s %s" % (fn,ln))
         pred = "No result"
         real = "No record exists for " + fn +" " +ln
