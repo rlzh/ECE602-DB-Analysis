@@ -5,8 +5,11 @@ import time
 import random
 import traceback
 import threading
-
-import datamining
+import sys
+import datamining as datamining
+import argparse
+import getpass
+import credential as creds
 
 # shared network message definitions
 BUFFER_SIZE = 1024
@@ -23,6 +26,28 @@ TABLES_KEY = "tbl"
 ANALYZE_MODE_KEY = "ayz_m"
 FIRST_NAME_KEY = "fn"
 LAST_NAME_KEY = "ln"
+
+# parse args
+PARSER = argparse.ArgumentParser(description="")
+PARSER.add_argument('-u', '--user', default='root',
+                    help='username for database access')
+PARSER.add_argument('-p', '--password', action='store_true', dest='password',
+                    help='password for database access')
+PARSER.add_argument('-pt', '--port', default=9999, type=int,
+                    help='port server should listen on for incoming client connection & messages')
+PARSER.add_argument('-db', '--database', default='lahman2016',
+                    help='name of database that should be used')
+PARSER.add_argument('-ht', '--host', default='localhost',
+                    help='host name for database access')
+ARGS = PARSER.parse_args()
+print(ARGS)
+
+# read args
+if ARGS.password:
+    creds.password = getpass.getpass()
+creds.database = ARGS.database
+creds.user = ARGS.user
+creds.host = ARGS.host
 
 
 def handle_message(msg):
@@ -65,7 +90,7 @@ def handle_message(msg):
             else:
                 table = "All"
 
-            acc,f1 = datamining.AnalyzeMining(mode, table)
+            acc, f1 = datamining.AnalyzeMining(mode, table)
 
             mining_data = {
                 "acc": acc,
@@ -102,6 +127,7 @@ def handle_message(msg):
             # todo: call analyze func here
             # e.g. resp["d"], success = validate_func()
     except Exception as e:
+        traceback.print_exc()
         return {STATUS_KEY: ERR_STR}
     return resp
 
@@ -120,13 +146,14 @@ def listen_to_client(s):
         s.close()
 
 
-def main():
+def main(argv):
+
     # create a socket object
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # get local machine name
     host = socket.gethostname()
-    port = 9999
+    port = ARGS.port
 
     # bind to the port
     serversocket.bind((host, port))
@@ -148,4 +175,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
