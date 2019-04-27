@@ -49,11 +49,9 @@ class Window(Frame):
         ]
         self.query_table_labels = [
             "Batting",
-            "BattingPost",
             "Fielding",
-            "FieldingPost",
             "Pitching",
-            "PitchingPost",
+            "All",
         ]
         self.analysis_mode_labels = [
             "HoF Nomination",
@@ -102,7 +100,7 @@ class Window(Frame):
             analysis_frame, text="Analysis Options")
         analysis_options_frame.pack(side="left", expand="yes")
         self.analyze_listbox = tk.Listbox(analysis_options_frame,
-                                          selectmode="multiple")
+                                          selectmode="SINGLE")
         self.analyze_listbox.pack(side='left', expand='yes')
         # add each query table to listbox
         for i in range(len(self.query_table_labels)):
