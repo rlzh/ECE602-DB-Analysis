@@ -20,7 +20,9 @@ class DataCleaner():
         self.add_foreign_file = os.path.join(sql_dir,"add_foreign.sql")
         self.mismatch_file = os.path.join(sql_dir, "mismatch.sql")
         self.drop_primary_file = os.path.join(sql_dir, "drop_primary.sql")
-        self.drop_foreign_file = os.path.join(sql_dir,"drop_foreign.sql")
+        self.drop_foreign_file = os.path.join(sql_dir, "drop_foreign.sql")
+        self.create_view_file = os.path.join(sql_dir, "createview.sql")
+        self.drop_view_file = os.path.join(sql_dir,"dropview.sql")
         self.unclean_file = os.path.join(sql_dir,"unclean.sql")
         self.load_db_file = os.path.join(sql_dir,"lahman2016.sql")
 
@@ -105,12 +107,19 @@ class DataCleaner():
     def add_all(self):
         return self.add_primary() and self.fix_mismatch() and self.add_foreign()
 
+    def create_view(self):
+        return self._execute_update_sql(self.create_view_file)
+    
+
     def unclean(self):
         if shared.added_primary:
             shared.added_primary = not self._execute_update_sql(self.drop_primary_file)
         if shared.added_foreign:
             shared.added_foreign = not self._execute_update_sql(self.drop_foreign_file)
-        return shared.added_primary == False and shared.added_foreign == False and self._execute_update_sql(self.unclean_file)
+        return shared.added_primary == False \
+            and shared.added_foreign == False \
+            and self._execute_update_sql(self.unclean_file) \
+            and self._execute_update_sql(self.drop_view_file)
 
 
 def handle_clean(msg_data):
@@ -135,15 +144,16 @@ def handle_clean(msg_data):
         shared.database
     )
 
-    if option == accepted[0]:
-        return cleaner.add_primary()
-    elif option == accepted[1]:
-        return cleaner.add_primary() and cleaner.fix_mismatch() and cleaner.add_foreign()
-    elif option == accepted[2]:
-        return cleaner.fix_mismatch()
-    elif option == accepted[3]:
-        return cleaner.add_all()
-    return True
+    if cleaner.create_view():
+        if option == accepted[0]:
+            return cleaner.add_primary()
+        elif option == accepted[1]:
+            return cleaner.add_primary() and cleaner.fix_mismatch() and cleaner.add_foreign()
+        elif option == accepted[2]:
+            return cleaner.fix_mismatch()
+        elif option == accepted[3]:
+            return cleaner.add_all()
+    return False
 
 def handle_unclean():
     cleaner = DataCleaner(

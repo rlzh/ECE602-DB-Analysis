@@ -140,39 +140,39 @@ def listen_to_client(s):
 
 def main(argv):
 
-    # when start create view first
-    host = shared.host
-    user = shared.user
-    password = shared.password
-    database = shared.database
+    # # when start create view first
+    # host = shared.host
+    # user = shared.user
+    # password = shared.password
+    # database = shared.database
 
-    db = pymysql.connect(host,user,password,database)
-    print("connecting to db..")
+    # db = pymysql.connect(host,user,password,database)
+    # print("connecting to db..")
 
-    # prepare a cursor object using cursor() method
-    c = db.cursor()
+    # # prepare a cursor object using cursor() method
+    # c = db.cursor()
 
-    # Execute the SQL command
-    fd = open(os.path.join(shared.abs_path,'createview.sql'), 'r')
-    sqlFile = fd.read()
-    fd.close()
+    # # Execute the SQL command
+    # fd = open(os.path.join(shared.abs_path,'createview.sql'), 'r')
+    # sqlFile = fd.read()
+    # fd.close()
 
-    # all SQL commands (split on ';')
-    sqlCommands = sqlFile.split(';')
+    # # all SQL commands (split on ';')
+    # sqlCommands = sqlFile.split(';')
 
-    # Execute every command from the input file
-    for command in sqlCommands:
-        # This will skip and report errors
-        # For example, if the tables do not yet exist, this will skip over
-        # the DROP TABLE commands
-        try:
-            if len(command) > 0:
-                c.execute(command)
-        except Exception as e:
-            print("Error executing command")
-    # disconnect from server
-    db.close()
-    print("disconnecting from db..")
+    # # Execute every command from the input file
+    # for command in sqlCommands:
+    #     # This will skip and report errors
+    #     # For example, if the tables do not yet exist, this will skip over
+    #     # the DROP TABLE commands
+    #     try:
+    #         if len(command) > 0:
+    #             c.execute(command)
+    #     except Exception as e:
+    #         print("Error executing command")
+    # # disconnect from server
+    # db.close()
+    # print("disconnecting from db..")
 
     # to do: when exit drop view
     # create a socket object
