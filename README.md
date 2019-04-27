@@ -20,6 +20,8 @@ The server process includes database connection, sql query, decision tree constr
 
 4. Using this system
 
+0) install required python packages using pip install -r requirements.txt
+
 1) Start python process server_main.py in server, with command:
     python server/server_main.py [-h] [-u USER] [-p PASSWORD] [-pt PORT] [-db DATABASE] [-ht HOST]
     please use python server/server_main.py -h for details. This process needs to be grant permission to create view in database in order to gain process speed. 
