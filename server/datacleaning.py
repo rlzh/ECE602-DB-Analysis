@@ -123,7 +123,6 @@ class DataCleaner():
 
 
 def handle_clean(msg_data):
-    return True
     accepted = [
         "Add Primary Only",
         "Add Primary and Foreign",
