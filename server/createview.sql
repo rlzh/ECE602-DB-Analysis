@@ -1,25 +1,25 @@
-CREATE OR REPLACE OR REPLACE VIEW tbatting as 
+CREATE OR REPLACE VIEW tbatting as 
 select playerID, sum(G) as bG, sum(AB) as bAB, sum(R) as bR, sum(H) as bH, 
 sum(2B) as b2B, sum(3B) as b3B, sum(HR) as bHR, 
 sum(RBI) as bRBI, sum(SB) as bSB, sum(CS) as bCS, sum(BB) as bBB, sum(SO) as bSO, sum(IBB) as bIBB, 
-sum(HBP) as bHBP, sum(SH) as bSH, sum(SF) as bSF from batting group by playerID;
+sum(HBP) as bHBP, sum(SH) as bSH, sum(SF) as bSF from Batting group by playerID;
 
 CREATE OR REPLACE VIEW tbattingpost as 
 select playerID, sum(G) as bpG, sum(AB) as bpAB, sum(R) as bpR, sum(H) as bpH, sum(2B) as bp2B, sum(3B) as bp3B, sum(HR) as bpHR, 
 sum(RBI) as bpRBI, sum(SB) as bpSB, sum(CS) as bpCS, sum(BB) as bpBB, sum(SO) as bpSO, sum(IBB) as bpIBB, 
-sum(HBP) as bpHBP, sum(SH) as bpSH, sum(SF) as bpSF from battingpost group by playerID;
+sum(HBP) as bpHBP, sum(SH) as bpSH, sum(SF) as bpSF from BattingPost group by playerID;
 
 CREATE OR REPLACE VIEW tfieldingpost as 
 select playerID, sum(POS) as fpPOS, sum(G) as fpG, sum(GS) as fpGS, sum(InnOuts) as fpIO, sum(PO) as fpPO, 
 sum(A) as fpA, sum(E) as fpE, sum(DP) as fpDP, sum(TP) as fpTP,
 sum(PB) as fpPB, sum(SB) as fpSB, sum(CS) as fpCS
-from fieldingpost group by playerID;
+from FieldingPost group by playerID;
 
 CREATE OR REPLACE VIEW tfielding as 
 select playerID, sum(POS) as fPOS, sum(G) as fG, sum(GS) as fGS, sum(InnOuts) as fIO, sum(PO) as fPO, 
 sum(A) as fA, sum(E) as fE, sum(DP) as fDP, sum(WP) as fWP,
 sum(PB) as fPB, sum(SB) as fSB, sum(CS) as fCS, sum(ZR)as fZR
-from fielding group by playerID;
+from Fielding group by playerID;
 
 CREATE OR REPLACE VIEW tpitching as 
 select playerID, sum(W) as pW, sum(L) as pL, sum(G) as pG, sum(GS) as pGS, sum(CG) as pCG,
@@ -49,10 +49,10 @@ CREATE OR REPLACE VIEW tHOF as
 select playerID, 1 as hof from HallOfFame where inducted = 'Y' group by playerID;
 
 CREATE OR REPLACE VIEW tMan as 
-select master.playerID, 1 as tomanager from master inner join Managers on master.playerID = Managers.playerID;
+select Master.playerID, 1 as tomanager from Master inner join Managers on Master.playerID = Managers.playerID;
 
 CREATE OR REPLACE VIEW player as 
-select playerID,nameFirst,nameLast from master;
+select playerID,nameFirst,nameLast from Master;
 
 
 CREATE OR REPLACE VIEW treesource as
