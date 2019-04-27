@@ -160,6 +160,7 @@ class Window(Frame):
         output_frame.pack(fill="x")
         self.console = scrolledtext.ScrolledText(output_frame)
         self.console.pack(fill="x")
+        self.console.pack(fill="x")
         self.console.config(height=10)
 
         # bottom buttons
@@ -258,14 +259,18 @@ class Window(Frame):
         Logs msg onto console frame 
         msg - string to be logged
         '''
+        self.console.config(state='normal')
         self.console.insert(tk.INSERT, "{}\n".format(msg))
         self.console.yview_moveto(1.0)
+        self.console.config(state='disabled')
 
     def clear_console(self):
         '''
         Clears all content from console frame
         '''
+        self.console.config(state='normal')
         self.console.delete(1.0, tk.END)
+        self.console.config(state='disabled')
 
     def update_request_button_state(self, state):
         '''
