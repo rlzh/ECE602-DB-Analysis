@@ -349,7 +349,7 @@ def main():
     root = Tk()
 
     # size of the window
-    root.geometry("600x700")
+    root.geometry("600x750")
 
     app = Window("ECE656 Project", root)
     root.mainloop()
