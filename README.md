@@ -4,13 +4,13 @@ By: Yuan Ma & Ryan Liu
 
 1. Introduction
 
-This server-client data mining system aims to analyze whether a player can be nominated to Hall of Fame, whether can be inducted into Hall of Fame and wether he will become manager later, based on his performance in batting, fielding, pitching or all. 
+This server-client data mining system aims to analyze whether a player will be nominated to Hall of Fame, whether will be inducted into Hall of Fame and wether he will become manager later, based on his performance in batting, fielding, pitching or all. 
 
 2. Client function
 
-The client interface contains three parts: Data cleaning, Data Analysis and Data Validation. 
+The client interface contains three parts: Data cleaning, Data Analysis, and Data Validation. 
 
-Data Cleaning is for adding indexes and removing incorrect values of playerID and teamID in Batting, Fielding, Pitching, AwardsPlayers, HallOfFame and Managers tables, refer to Master table. 
+Data Cleaning is for adding indexes and removing incorrect values of playerID and teamID in Batting, Fielding, Pitching, AwardsPlayers, HallOfFame, and Managers tables, refer to Master table. 
 
 Data Analysis is to give overall accuary and f1 score for prediction. User can select their desired source for analysis: using individual table or all tables. And then choose the analysis type: HallofFame nomination, HallofFame or will become a manager. The result will be print in the output log. 
 

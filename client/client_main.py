@@ -37,6 +37,7 @@ class Window(Frame):
         self.last_name_str = StringVar()
         self.clean_str = StringVar()
         self.clean_str.set("Clean")
+        self.is_clean = False
         self.analysis_mode_int = IntVar()
         self.analysis_mode_int.set(0)
         self.serversocket = None
@@ -81,14 +82,14 @@ class Window(Frame):
         self.clean_listbox.activate(len(self.clean_options_labels)-1)
 
         # clean button
-        clean_button = tk.Button(
+        self.clean_button = tk.Button(
             self.clean_frame,
             textvariable=self.clean_str,
             width=BUTTON_WIDTH,
             command=self.clean_unclean,
         )
-        clean_button.pack(side="right")
-        self.request_buttons.append(clean_button)
+        self.clean_button.pack(side="right")
+        self.request_buttons.append(self.clean_button)
 
         # analysis layout setup
         analysis_frame = tk.LabelFrame(self.master, text="Data Analysis")
@@ -125,6 +126,7 @@ class Window(Frame):
             command=self.analyze,
         )
         analyze_button.pack(side="right")
+        analyze_button.config(state="disabled")
         self.request_buttons.append(analyze_button)
 
         # validate layout setup
@@ -150,6 +152,7 @@ class Window(Frame):
             command=self.validate,
         )
         validate_button.pack(side="right")
+        validate_button.config(state="disabled")
         self.request_buttons.append(validate_button)
 
         # output log layout setup
@@ -200,7 +203,7 @@ class Window(Frame):
         msg = {
             MSG_TYPE_KEY: "",
         }
-        if self.clean_str.get() == "Clean":
+        if self.is_clean == False:
             msg[MSG_TYPE_KEY] = CLEAN_MSG_TYPE
             # gather options from checkboxes
             options_list = []
@@ -270,6 +273,10 @@ class Window(Frame):
         state - 'disabled', 'active', 'normal' 
         '''
         for button in self.request_buttons:
+            if state == "normal":
+                if button != self.clean_button and self.is_clean == False:
+                    continue
+                    
             button.config(state=state)
 
     def send_request(self, msg):
@@ -301,10 +308,7 @@ class Window(Frame):
             resp = self.serversocket.recv(BUFFER_SIZE)
             resp = json.loads(pickle.loads(resp))
             print(resp)
-            # disable cancel request button
-            self.cancel_button.config(state="disabled")
-            # enable request buttons
-            self.update_request_button_state("normal")
+           
             # log results to output
             self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
             if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
@@ -313,8 +317,15 @@ class Window(Frame):
             # toggle clean/unclean button text
             if resp[MSG_TYPE_KEY] == CLEAN_MSG_TYPE:
                 self.clean_str.set("Unclean")
+                self.is_clean = True
             elif resp[MSG_TYPE_KEY] == UNCLEAN_MSG_TYPE:
                 self.clean_str.set("Clean")
+                self.is_clean = False
+
+            # disable cancel request button
+            self.cancel_button.config(state="disabled")
+            # enable request buttons
+            self.update_request_button_state("normal")
         except Exception as e:
             pass
 
