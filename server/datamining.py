@@ -125,8 +125,8 @@ def ValidationMining(target, fn, ln):
     realdata = databaseconnection(r_sql)
     if realdata == None or len(realdata) == 0:
         print("No record exists for %s %s" % (fn,ln))
-        pred = "No result"
-        real = "No record exists for " + fn +" " +ln
+        pred = "Unknown"
+        real = "Unknown"
         #exit()
         return pred, real
     else:

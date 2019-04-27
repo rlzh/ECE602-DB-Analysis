@@ -10,6 +10,7 @@ import datamining as datamining
 import argparse
 import getpass
 import credential as creds
+import pymysql
 
 # shared network message definitions
 BUFFER_SIZE = 1024
@@ -145,10 +146,41 @@ def listen_to_client(s):
         # traceback.print_exc()
         s.close()
 
-
-def main():
+def main(argv):
 
     # to do: when start create view first
+    host = creds.host
+    user = creds.user
+    password = creds.password
+    database = creds.database
+
+    db = pymysql.connect(host,user,password,database)
+    print("connecting to db..")
+
+    # prepare a cursor object using cursor() method
+    c = db.cursor()
+
+    # Execute the SQL command
+    fd = open('createview.sql', 'r')
+    sqlFile = fd.read()
+    fd.close()
+
+    # all SQL commands (split on ';')
+    sqlCommands = sqlFile.split(';')
+
+    # Execute every command from the input file
+    for command in sqlCommands:
+        # This will skip and report errors
+        # For example, if the tables do not yet exist, this will skip over
+        # the DROP TABLE commands
+        try:
+            c.execute(command)
+        except:
+            print("Command skipped")
+    # disconnect from server
+    db.close()
+    print("disconnecting to db..")
+
     # to do: when exit drop view
     # create a socket object
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
