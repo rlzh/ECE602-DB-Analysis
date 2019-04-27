@@ -34,3 +34,6 @@ The server process includes database connection, sql query, decision tree constr
 4) Select desired source and target for data analysis. Please wait for 1-2 mins to finish as the decision tree needs to be built from scratch. The result of accurancy and F1 score will be shown in output log. 
 
 5) Enter player's first name, last name and desired analysis type for data validation. Please wait for 1-2 mins to finish as the decision tree needs to be built from scratch. The result of decision tree prediction and acutal value will be shown in the output log. 
+
+
+NOTE: When running on macOS, there is an issue with button text not displaying properly until the window is resized. Also, dark mode on macOS is not supported.
