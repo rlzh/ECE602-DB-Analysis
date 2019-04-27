@@ -112,10 +112,10 @@ class DataCleaner():
     
 
     def unclean(self):
-        if shared.added_primary:
-            shared.added_primary = not self._execute_update_sql(self.drop_primary_file)
         if shared.added_foreign:
             shared.added_foreign = not self._execute_update_sql(self.drop_foreign_file)
+        if shared.added_primary:
+            shared.added_primary = not self._execute_update_sql(self.drop_primary_file)
         return shared.added_primary == False \
             and shared.added_foreign == False \
             and self._execute_update_sql(self.unclean_file) \
