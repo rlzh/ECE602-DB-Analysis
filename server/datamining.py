@@ -28,8 +28,6 @@ def removezero(df):
         #print("Column %s max is %s" % (column,df[column].max()))
         if df[column].max() == 0:
             df.drop(columns=[column], inplace = True)
-        # elif column == "pBK" or column == "award":
-        #     df.drop(columns=[column], inplace = True)
     return df
 
 # Open database connection

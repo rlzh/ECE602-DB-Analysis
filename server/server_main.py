@@ -121,6 +121,9 @@ def listen_to_client(s):
 
 
 def main():
+
+    # to do: when start create view first
+    # to do: when exit drop view
     # create a socket object
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
