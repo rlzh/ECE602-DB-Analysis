@@ -313,14 +313,15 @@ class Window(Frame):
             self.log("Server reponse status: {}".format(resp[STATUS_KEY]))
             if resp[STATUS_KEY] == OK_STR and DATA_KEY in resp:
                 self.log("Result: {}".format(resp[DATA_KEY]))
-
-            # toggle clean/unclean button text
-            if resp[MSG_TYPE_KEY] == CLEAN_MSG_TYPE:
-                self.clean_str.set("Unclean")
-                self.is_clean = True
-            elif resp[MSG_TYPE_KEY] == UNCLEAN_MSG_TYPE:
-                self.clean_str.set("Clean")
-                self.is_clean = False
+            
+            if resp[STATUS_KEY] == OK_STR:
+                # toggle clean/unclean button text
+                if resp[MSG_TYPE_KEY] == CLEAN_MSG_TYPE:
+                    self.clean_str.set("Unclean")
+                    self.is_clean = True
+                elif resp[MSG_TYPE_KEY] == UNCLEAN_MSG_TYPE:
+                    self.clean_str.set("Clean")
+                    self.is_clean = False
 
             # disable cancel request button
             self.cancel_button.config(state="disabled")
