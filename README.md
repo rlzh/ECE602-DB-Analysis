@@ -22,7 +22,7 @@ The server process includes database connection, sql query, decision tree constr
 
 4. Using this system
 
-0) This project is built using python 3. Install required python packages using "pip install -r requirements.txt" (For Ubuntu, will also need to install tkinter for python3 via apt-get)
+0) This project is built using Python 3. Install required python packages using "pip install -r requirements.txt" (For Ubuntu, you will also need to install tkinter for python3 via apt-get)
 
 1) Start python process server_main.py in server, with command:
     python server/server_main.py [-h] [-u USER] [-p PASSWORD] [-pt PORT] [-db DATABASE] [-ht HOST]
