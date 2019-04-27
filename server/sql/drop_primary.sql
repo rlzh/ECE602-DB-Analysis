@@ -15,7 +15,7 @@ alter table Managers drop primary key;
 -- alter table Salaries drop primary key;
 -- alter table SeriesPost drop primary key;
 -- alter table AwardsManagers drop primary key;
--- alter table AwardsPlayers drop primary key;
+alter table AwardsPlayers drop primary key;
 -- alter table AwardsShareManagers drop primary key;
 -- alter table AwardsSharePlayers drop primary key;
 -- alter table FieldingPost drop primary key;
