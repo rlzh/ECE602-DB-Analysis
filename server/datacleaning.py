@@ -123,6 +123,7 @@ class DataCleaner():
 
 
 def handle_clean(msg_data):
+    return True
     accepted = [
         "Add Primary Only",
         "Add Primary and Foreign",
@@ -144,15 +145,20 @@ def handle_clean(msg_data):
         shared.database
     )
 
-    if cleaner.create_view():
-        if option == accepted[0]:
-            return cleaner.add_primary()
-        elif option == accepted[1]:
-            return cleaner.add_primary() and cleaner.fix_mismatch() and cleaner.add_foreign()
-        elif option == accepted[2]:
-            return cleaner.fix_mismatch()
-        elif option == accepted[3]:
-            return cleaner.add_all()
+    if option == accepted[0]:
+        return cleaner.add_primary() and cleaner.create_view()
+    elif option == accepted[1]:
+        return cleaner.add_primary() \
+            and cleaner.fix_mismatch() \
+                and cleaner.add_foreign() \
+                    and cleaner.create_view()
+    elif option == accepted[2]:
+        return cleaner.add_primary() \
+            and cleaner.fix_mismatch() \
+            and cleaner.create_view()
+    elif option == accepted[3]:
+        return cleaner.add_all() \
+            and cleaner.create_view() 
     return False
 
 def handle_unclean():
