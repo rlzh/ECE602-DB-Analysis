@@ -164,8 +164,7 @@ CREATE TABLE `HallOfFame`
 --  Records of `HallOfFame`
 -- ----------------------------
 BEGIN;
-    INSERT INTO `
-    HallOfFame`
+    INSERT INTO `HallOfFame`
     VALUES
         ('cobbty01', '1936', 'BBWAA', '226', '170', '222', 'Y', 'Player', ''),
         ('ruthba01', '1936', 'BBWAA', '226', '170', '215', 'Y', 'Player', ''),
@@ -1079,8 +1078,7 @@ BEGIN;
         ('dickebi01', '1949', 'BBWAA', '153', '115', '65', 'N', 'Player', ''),
         ('wanerpa01', '1949', 'Run Off', '187', '0', '63', 'N', 'Player', '1st'),
         ('heilmha01', '1949', 'BBWAA', '153', '115', '59', 'N', 'Player', '');
-    INSERT INTO `
-    HallOfFame`
+    INSERT INTO `HallOfFame`
     VALUES
         ('maranra01', '1949', 'BBWAA', '153', '115', '58', 'N', 'Player', ''),
         ('heilmha01', '1949', 'Run Off', '187', '0', '52', 'N', 'Player', '1st'),
@@ -2013,8 +2011,7 @@ BEGIN;
         ('stanked01', '1960', 'BBWAA', '269', '202', '3', 'N', 'Player', ''),
         ('whiteea01', '1960', 'BBWAA', '269', '202', '3', 'N', 'Player', ''),
         ('edwarha01', '1960', 'BBWAA', '269', '202', '2', 'N', 'Player', '');
-    INSERT INTO `
-    HallOfFame`
+    INSERT INTO `HallOfFame`
     VALUES
         ('elliobo01', '1960', 'BBWAA', '269', '202', '2', 'N', 'Player', ''),
         ('gonzami01', '1960', 'BBWAA', '269', '202', '2', 'N', 'Player', ''),
@@ -2942,8 +2939,7 @@ BEGIN;
         ('aparilu01', '1980', 'BBWAA', '385', '289', '124', 'N', 'Player', ''),
         ('marisro01', '1980', 'BBWAA', '385', '289', '111', 'N', 'Player', ''),
         ('vernomi01', '1980', 'BBWAA', '385', '289', '96', 'N', 'Player', '');
-    INSERT INTO `
-    HallOfFame`
+    INSERT INTO `HallOfFame`
     VALUES
         ('kuennha01', '1980', 'BBWAA', '385', '289', '83', 'N', 'Player', ''),
         ('burdele01', '1980', 'BBWAA', '385', '289', '66', 'N', 'Player', ''),
@@ -3872,8 +3868,7 @@ BEGIN;
         ('worreto01', '2003', 'BBWAA', '496', '372', '0', 'N', 'Player', ''),
         ('molitpa01', '2004', 'BBWAA', '506', '380', '431', 'Y', 'Player', ''),
         ('eckerde01', '2004', 'BBWAA', '506', '380', '421', 'Y', 'Player', '');
-    INSERT INTO `
-    HallOfFame`
+    INSERT INTO `HallOfFame`
     VALUES
         ('sandbry01', '2004', 'BBWAA', '506', '380', '309', 'N', 'Player', ''),
         ('suttebr01', '2004', 'BBWAA', '506', '380', '301', 'N', 'Player', ''),

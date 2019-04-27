@@ -7,9 +7,10 @@ import traceback
 import threading
 import sys
 import datamining as datamining
+import datacleaning
 import argparse
 import getpass
-import credential as creds
+import shared
 
 # shared network message definitions
 BUFFER_SIZE = 1024
@@ -42,12 +43,12 @@ PARSER.add_argument('-ht', '--host', default='localhost',
 ARGS = PARSER.parse_args()
 print(ARGS)
 
-# read args
+# set shareds
 if ARGS.password:
-    creds.password = getpass.getpass()
-creds.database = ARGS.database
-creds.user = ARGS.user
-creds.host = ARGS.host
+    shared.password = getpass.getpass()
+shared.database = ARGS.database
+shared.user = ARGS.user
+shared.host = ARGS.host
 
 
 def handle_message(msg):
@@ -58,16 +59,12 @@ def handle_message(msg):
             STATUS_KEY: OK_STR,
             MSG_TYPE_KEY: msg[MSG_TYPE_KEY],
         }
-        # dummy sleep
-        time.sleep(1)
         if msg_type == CLEAN_MSG_TYPE:
-            pass
-            # todo: call clean func here
-            # e.g. resp["d"], success = clean_func()
+            ok = datacleaning.handle_clean(msg[DATA_KEY])
+            resp[STATUS_KEY] = OK_STR if ok else ERR_STR
         elif msg_type == UNCLEAN_MSG_TYPE:
-            pass
-            # todo: call clean func here
-            # e.g. resp["d"], success = clean_func()
+            ok = datacleaning.handle_unclean()
+            resp[STATUS_KEY] = OK_STR if ok else ERR_STR
         elif msg_type == ANALYZE_MSG_TYPE:
 
             content = msg[DATA_KEY]
@@ -98,9 +95,6 @@ def handle_message(msg):
             }
             resp[DATA_KEY] = mining_data
 
-            # todo: call analyze func here
-            # e.g. resp["d"], success = analyze_func()
-
         elif msg_type == VALIDATE_MSG_TYPE:
             # dummy resp (comment out later)
             # Received msg: {"t": "val", "d": {"ayz_m": "HoF Nomination", "fn": "ww ", "ln": "aa"}}
@@ -123,9 +117,6 @@ def handle_message(msg):
                 "gnd truth": real
             }
             resp[DATA_KEY] = mining_data
-
-            # todo: call analyze func here
-            # e.g. resp["d"], success = validate_func()
     except Exception as e:
         traceback.print_exc()
         return {STATUS_KEY: ERR_STR}
@@ -147,7 +138,6 @@ def listen_to_client(s):
 
 
 def main(argv):
-
     # create a socket object
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -161,6 +151,8 @@ def main(argv):
     # queue up to 5 requests
     serversocket.listen(5)
     clientsocket = None
+
+    
     while True:
         # establish a connection
         print("Listening for client connection on {}:{}...".format(host, port))

@@ -1,5 +1,5 @@
 import pymysql
-import credential
+import shared
 import tree
 import pandas as pd
 import numpy as np
@@ -35,10 +35,10 @@ def removezero(df):
 # Open database connection
 
 def databaseconnection(sql):
-    host = credential.host
-    user = credential.user
-    password = credential.password
-    database = credential.database
+    host = shared.host
+    user = shared.user
+    password = shared.password
+    database = shared.database
 
     db = pymysql.connect(host,user,password,database)
     print("connecting to db..")
@@ -47,9 +47,9 @@ def databaseconnection(sql):
     cursor = db.cursor()
 
     try:
-    # Execute the SQL command
+        # Execute the SQL command
         cursor.execute(sql)
-    # Fetch all the rows in a list of lists.
+        # Fetch all the rows in a list of lists.
         results = cursor.fetchall()
     except:
         print ("Error: unable to fetch data")

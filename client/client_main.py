@@ -42,10 +42,10 @@ class Window(Frame):
         self.serversocket = None
         self.request_buttons = []
         self.clean_options_labels = [
-            "Missing SchoolIDs",
-            "Missing PlayerIDs",
-            "Missing TeamIDs",
-            "Add Indices",
+            "Add Primary Only",
+            "Add Primary and Foreign",
+            "Mismatching Values",
+            "All",
         ]
         self.query_table_labels = [
             "Batting",
@@ -72,16 +72,14 @@ class Window(Frame):
         self.clean_options_frame = tk.LabelFrame(
             self.clean_frame, text="Cleaning Options")
         self.clean_options_frame.pack(side="left", expand="yes")
-        self.clean_checkboxes = []
-        self.clean_checkbox_ints = []
-        for label in self.clean_options_labels:
-            chk_state = IntVar()
-            chk_state.set(1)
-            chk = Checkbutton(self.clean_options_frame, text=label,
-                              variable=chk_state, anchor='w')
-            chk.pack(side='bottom')
-            self.clean_checkboxes.append(chk)
-            self.clean_checkbox_ints.append(chk_state)
+        self.clean_listbox = tk.Listbox(self.clean_options_frame,
+                                          selectmode="SINGLE")
+        self.clean_listbox.pack(side='left', expand='yes')
+        # add each clean option to listbox
+        for i in range(len(self.clean_options_labels)):
+            self.clean_listbox.insert(i, self.clean_options_labels[i])
+        self.clean_listbox.activate(len(self.clean_options_labels)-1)
+
         # clean button
         clean_button = tk.Button(
             self.clean_frame,
@@ -105,6 +103,8 @@ class Window(Frame):
         # add each query table to listbox
         for i in range(len(self.query_table_labels)):
             self.analyze_listbox.insert(i, self.query_table_labels[i])
+        self.analyze_listbox.activate(len(self.query_table_labels)-1)
+
         # analysis type frame
         analysis_type_frame = tk.LabelFrame(
             analysis_frame, text="Analysis Type")
@@ -164,18 +164,18 @@ class Window(Frame):
         bot_frame.pack(fill="both", expand="yes", side="bottom")
         clear_button = tk.Button(
             bot_frame,
-            text="Clear",
+            text="Clear Log",
             width=BUTTON_WIDTH,
             command=self.clear_console,
         )
-        clear_button.pack(side="left")
+        clear_button.pack()
         self.cancel_button = tk.Button(
             bot_frame,
             text="Cancel",
             width=BUTTON_WIDTH,
             command=self.cancel_request,
         )
-        self.cancel_button.pack(side="right")
+        # self.cancel_button.pack(side="right")
         self.cancel_button.config(state="disabled")
 
     def init_socket(self):
@@ -203,10 +203,13 @@ class Window(Frame):
         if self.clean_str.get() == "Clean":
             msg[MSG_TYPE_KEY] = CLEAN_MSG_TYPE
             # gather options from checkboxes
-            bool_list = {}
-            for labels, state in list(zip(self.clean_options_labels, self.clean_checkbox_ints)):
-                bool_list[labels] = state.get()
-            msg[DATA_KEY] = bool_list
+            options_list = []
+            for i in self.clean_listbox.curselection():
+                options_list.append(self.clean_options_labels[i])
+            if len(options_list) == 0:
+                self.log("CLANG! need to select at least one option for cleaning")
+                return
+            msg[DATA_KEY] = options_list
         else:
             msg[MSG_TYPE_KEY] = UNCLEAN_MSG_TYPE
 
@@ -334,7 +337,7 @@ def main():
     root = Tk()
 
     # size of the window
-    root.geometry("700x600")
+    root.geometry("600x700")
 
     app = Window("ECE656 Project", root)
     root.mainloop()
