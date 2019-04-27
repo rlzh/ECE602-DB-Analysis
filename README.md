@@ -22,7 +22,7 @@ The server process includes database connection, sql query, decision tree constr
 
 4. Using this system
 
-0) install required python packages using pip install -r requirements.txt
+0) Install required python packages using "pip install -r requirements.txt"
 
 1) Start python process server_main.py in server, with command:
     python server/server_main.py [-h] [-u USER] [-p PASSWORD] [-pt PORT] [-db DATABASE] [-ht HOST]
@@ -31,7 +31,7 @@ The server process includes database connection, sql query, decision tree constr
 2) Start client interface in user terminal:
     python client/client_main.py
 
-3) Select desired cleaning options for database cleaning. The process will take around X mins to finish.
+3) Select desired cleaning options for database cleaning. The process will take around 1-2 mins to finish.
 
 4) Select desired source and target for data analysis. Please wait for 1-2 mins to finish as the decision tree needs to be built from scratch. The result of accurancy and F1 score will be shown in output log. 
 

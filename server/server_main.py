@@ -166,8 +166,9 @@ def main(argv):
         # For example, if the tables do not yet exist, this will skip over
         # the DROP TABLE commands
         try:
-            c.execute(command)
-        except:
+            if len(command) > 0:
+                c.execute(command)
+        except Exception as e:
             print("Error executing command")
     # disconnect from server
     db.close()
