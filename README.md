@@ -22,7 +22,7 @@ The server process includes database connection, sql query, decision tree constr
 
 1) Start python process server_main.py in server, with command:
     python server/server_main.py [-h] [-u USER] [-p PASSWORD] [-pt PORT] [-db DATABASE] [-ht HOST]
-    please use python server/server_main.py -h for details.
+    please use python server/server_main.py -h for details. This process needs to be grant permission to create view in database in order to gain process speed. 
 
 2) Start client interface in user terminal:
     python client/client_main.py
