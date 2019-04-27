@@ -3,6 +3,7 @@ import math
 import pandas as pd
 import numpy as np
 from random import randrange
+import progressbar as pbar
 
 class Node(object):
     def __init__(self, attribute, threshold):
@@ -81,7 +82,9 @@ def choose_attr(df, attributes, predict_attr):
     best_attr = None
     threshold = 0
     # Test each attribute (note attributes maybe be chosen more than once)
-    for attr in attributes:
+    
+    for i in pbar.progressbar(range(len(attributes))):
+        attr = attributes[i]
         thres = select_threshold(df, attr, predict_attr)
         ig = info_gain(df, attr, predict_attr, thres)
         #print("info gain for %s is %f" % (attr,ig))
