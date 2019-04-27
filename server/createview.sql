@@ -54,7 +54,6 @@ select Master.playerID, 1 as tomanager from Master inner join Managers on Master
 CREATE OR REPLACE VIEW player as 
 select playerID,nameFirst,nameLast from Master;
 
-
 CREATE OR REPLACE VIEW treesource as
 select player.playerID,bG,bAB,bR,bH,b2B,b3B,bHR,bRBI,bSB,bCS,bBB,bSO,bIBB,bHBP,bSH,bSF,
 fPOS,fG,fGS,fIO,fPO,fA,fE,fDP,fWP,fPB,fSB,fCS,fZR,
