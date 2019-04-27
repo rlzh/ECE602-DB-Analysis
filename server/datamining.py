@@ -28,8 +28,6 @@ def removezero(df):
         #print("Column %s max is %s" % (column,df[column].max()))
         if df[column].max() == 0:
             df.drop(columns=[column], inplace = True)
-        # elif column == "pBK" or column == "award":
-        #     df.drop(columns=[column], inplace = True)
     return df
 
 # Open database connection
@@ -58,7 +56,7 @@ def databaseconnection(sql):
 
     # disconnect from server
     db.close()
-    print("disconnecting to db..")
+    print("disconnecting from db..")
     return results
 
 def AnalyzeMining(target, tables):
@@ -127,8 +125,8 @@ def ValidationMining(target, fn, ln):
     realdata = databaseconnection(r_sql)
     if realdata == None or len(realdata) == 0:
         print("No record exists for %s %s" % (fn,ln))
-        pred = "No result"
-        real = "No record exists for " + fn +" " +ln
+        pred = "Unknown"
+        real = "Unknown"
         #exit()
         return pred, real
     else:

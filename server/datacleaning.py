@@ -15,15 +15,14 @@ class DataCleaner():
         self.db = db
 
         # sql files
-        abs_path = os.path.dirname(__file__)
-        abs_path = os.path.join(abs_path, "sql/")
-        self.add_primary_file = os.path.join(abs_path,"add_primary.sql")
-        self.add_foreign_file = os.path.join(abs_path,"add_foreign.sql")
-        self.mismatch_file = os.path.join(abs_path, "mismatch.sql")
-        self.drop_primary_file = os.path.join(abs_path, "drop_primary.sql")
-        self.drop_foreign_file = os.path.join(abs_path,"drop_foreign.sql")
-        self.unclean_file = os.path.join(abs_path,"unclean.sql")
-        self.load_db_file = os.path.join(abs_path,"lahman2016.sql")
+        sql_dir = os.path.join(shared.abs_path, "sql/")
+        self.add_primary_file = os.path.join(sql_dir,"add_primary.sql")
+        self.add_foreign_file = os.path.join(sql_dir,"add_foreign.sql")
+        self.mismatch_file = os.path.join(sql_dir, "mismatch.sql")
+        self.drop_primary_file = os.path.join(sql_dir, "drop_primary.sql")
+        self.drop_foreign_file = os.path.join(sql_dir,"drop_foreign.sql")
+        self.unclean_file = os.path.join(sql_dir,"unclean.sql")
+        self.load_db_file = os.path.join(sql_dir,"lahman2016.sql")
 
     def open_connection(self):
         try:

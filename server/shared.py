@@ -1,5 +1,8 @@
 import os
 
+# ABS path
+abs_path = os.path.dirname(__file__)
+
 # DB connection 
 host = "localhost"
 user = "root"
